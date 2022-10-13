@@ -2,9 +2,7 @@
 # -*- mode: cperl; indent-tabs-mode: nil; tab-width: 3; cperl-indent-level: 3; -*-
 use strict;
 use warnings;
-=pod
 use utf8;
-
 BEGIN {
 	$| = 1;
 	binmode(STDIN, ':encoding(UTF-8)');
@@ -12,7 +10,6 @@ BEGIN {
 }
 use open qw( :encoding(UTF-8) :std );
 use feature 'unicode_strings';
-=cut
 
 my %fs = (
    'word' => 0,

@@ -2,6 +2,14 @@
 # -*- mode: cperl; indent-tabs-mode: nil; tab-width: 3; cperl-indent-level: 3; -*-
 use strict;
 use warnings;
+use utf8;
+BEGIN {
+	$| = 1;
+	binmode(STDIN, ':encoding(UTF-8)');
+	binmode(STDOUT, ':encoding(UTF-8)');
+}
+use open qw( :encoding(UTF-8) :std );
+use feature 'unicode_strings';
 
 #script for parsing a corpora into a format compatible with CQP
 # Usage for ISO-8859-1 data:
