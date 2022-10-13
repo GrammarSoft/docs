@@ -1,0 +1,1 @@
+rsync -rltvzE --groupmap=*:xperohs --chmod=g+rw --partial /home/eckhard/perl /home/eckhard/parsers tinod@hpc-type3.sdu.dk:/work/xperohs/ '--exclude=.svn' '--exclude=**.log' '--exclude=*#*' '--exclude=*~*' --delete-excluded
