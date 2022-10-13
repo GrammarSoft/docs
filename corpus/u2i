@@ -1,0 +1,2 @@
+#!/bin/bash
+uconv -f utf-8 -t iso-8859-1 -x 'any-latin; [\u0100-\u7fff] nfd; [\u0100-\u7fff] remove' -c

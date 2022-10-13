@@ -1,0 +1,2 @@
+#!/bin/bash
+uconv -f utf-8 -t iso-8859-1 --to-callback escape-c

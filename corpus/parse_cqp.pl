@@ -18,7 +18,7 @@ use feature 'unicode_strings';
 # Usage for UTF-8 data:
 # PERL_UNICODE=SDA ./parse.pl input.cg | u2i > output
 #
-#example:     er      [være]      <mv>       V      PR AKT         @FMV      barelgazel
+#example:     er      [vÃ¦re]      <mv>       V      PR AKT         @FMV      barelgazel
 #meaning:     ordet   grundform    ?         ordklasse   Morfologi   Funktion  Tekst-kilde
 #attr-name:   word    lex         extra       pos      morph            func      src
 #
@@ -55,17 +55,17 @@ while (defined(my $input = <>)) {
       }
    }
 #   $input =~ s/^\$([^0-9]+?)[ \t].*/\$$1/; # punctuation with readings
-   $input =~ s/§ARG[0-9]& //g;
+   $input =~ s/Â§ARG[0-9]& //g;
 
    # Extract semantic roles
    my $role = '';
-   while ($input =~ s/\s+[§%](\S+)//) {
+   while ($input =~ s/\s+[Â§%](\S+)//) {
       $role .= "$1 ";
    }
    $role =~ s/\s+$//g;
 
 #   print "--$input";
-   $input =~ s/ [\£&][^ \n]+//g;
+   $input =~ s/ [\Â£&][^ \n]+//g;
    $input =~ s/ <((fr?|se):[^>]*|Rare[^>]*?|\'[^>]*?\'|exdem|\+[^>]*?|[0-9]+)>//g; # frequency, translation etc.
    # dependency
    if ($input =~ s/\s+#(\d+)(?:->|\x{2192})(\d+)//) {
@@ -83,7 +83,7 @@ while (defined(my $input = <>)) {
       $input =~ s/ cad=\"(.*?)\".*sec=\"(.*?)\".*?>/-$1-$2>/; # folha
       $input =~ s/ sec=(.*?) .*sem=(.*?)>/-$1-$2>/; # publico
    }
-   $input =~ s/^\$¤.*START.*\n//g; # now automated for all corpora through parse_new.pl
+   $input =~ s/^\$Â¤.*START.*\n//g; # now automated for all corpora through parse_new.pl
 
    ### next lines only for Portuguese??
    $input =~ s/( [A-Z]+) +(\@[\#&])/$1 \@X $2/g; # add @ function where missing in Portuguese (que, quem ...)
@@ -121,7 +121,7 @@ while (defined(my $input = <>)) {
 
    $input =~ s/ (&[A-Za-z\-]*|VFIN|CENTRAL) / /g; # bnc
 #   $input =~ s/(id=|ID=)[a-zA-Z]+([0-9]+)/$1$2/; # korpus90/2000 complexity reduction
-   $input =~ s/<pound-sign>/£/g;
+   $input =~ s/<pound-sign>/Â£/g;
    if ($input =~ /Not Enklish/ || $input =~ /\s\[\]/ || $input =~ /\s\[laid back\]/) {
       # engcg: !) etc.
       # engcg: rare special characters, removed, yield empty [] base forms
@@ -129,7 +129,7 @@ while (defined(my $input = <>)) {
       $input = '';
    }
 #   $input =~ s/^.*\[.* .*\]*\n//g; # engcg: rare special characters
-   $input =~ s/^¤\t¤ PU /\$¤\t\[¤\] PU /g;
+   $input =~ s/^Â¤\tÂ¤ PU /\$Â¤\t\[Â¤\] PU /g;
    $input =~ s/^\$\[/\$\{/g; # [ not tolerateted by parse.pl or cqp?
    $input =~ s/^\$\]/\$\}/g; # ] not tolerateted by parse.pl or cq
    $input =~ s/^\$+ *\n/USD\t\[USD\] N NOM P \@>N\n/g; # empty $ in bnc (also as a substitute for &, therefor best in corpfilter.bnc)
@@ -150,7 +150,7 @@ while (defined(my $input = <>)) {
       # Don't eat </s> lines
       $input =~ s@/@~u2044@g; # Unicode U+2044 Fraction Slash
    }
-   $input =~ s/\'/´/g;
+   $input =~ s/\'/Â´/g;
    if (! ($input =~ /[\[]/)) {
       $input =~ s/^ *([^<\$ \t\n])/\$$1/; # one of the worst problems: tokens without readings, but which are not recognized as punctuation (--vi, unknown English etc.) --- here parse.pl somehow fails to put \n after _End!_ in the .out files, which complete freezes the cqp-calling cgi, if a search hits that sentence
    }
@@ -243,17 +243,17 @@ sub look_for_sentence {
 #      print "--her source=$source\n";
       $novnum++;
       $source =~ s/(id=\")[0-9]+/$1$novnum/;
-      $source =~ s/_/-/g; # Wiki, før //
-      $source =~ s/ /-/g; # Wiki, før //
+      $source =~ s/_/-/g; # Wiki, fÃ¸r //
+      $source =~ s/ /-/g; # Wiki, fÃ¸r //
 
 #      $source =~ s/s=?[0-9]+//; # complexity reduction, only necessary if id written as attribute, not when written as 1. word
       if (! ($source =~ /oversize/)) {$altsource =$source;}
       if (! $startsentence) {
          print "</s>\n<s>\n";
-         print "¤\t$source\t\tPU\t\tSTART\t\t0\t0\t$end_seq\n";
+         print "Â¤\t$source\t\tPU\t\tSTART\t\t0\t0\t$end_seq\n";
          $startsentence =1;
       }
-#      print "¤\t¤\t\tPU\t\tSTART\t\t$end_seq\n";
+#      print "Â¤\tÂ¤\t\tPU\t\tSTART\t\t$end_seq\n";
 #      print "**SOURCE: $source\n";
       $_[0] = "";
    }
@@ -263,7 +263,7 @@ sub look_for_sentence {
    }
    else {
       #remove paragraph signs
-      $_[0] =~ s/^\$\¶.*//;
+      $_[0] =~ s/^\$\Â¶.*//;
       #remove lines with <xxx>
       $_[0] =~ s/^<[^>]*>.*$//;
    }
