@@ -4,11 +4,14 @@ use warnings;
 use strict;
 use bytes;
 no utf8;
-use Compress::Zlib;
 BEGIN {
    $| = 1;
    binmode(STDIN);
    binmode(STDOUT);
+}
+
+if (exists $ENV{'PERL_UNICODE'} && $ENV{'PERL_UNICODE'}) {
+   die("Envvar PERL_UNICODE should be empty for chunking!\n");
 }
 
 my $tag = 's';
@@ -28,21 +31,20 @@ print STDERR "Splitting on <${tag}> into ${chunk} MiB chunks.\n";
 $chunk *= 1024 * 1024;
 
 my $cur = 0;
-my $outfile = $outname.'-'.sprintf('%05d', $cur).'.gz';
-my $zo = gzopen($outfile, 'wb5');
+my $outfile = $outname.'-'.sprintf('%05d', $cur).'.zstd';
+open(my $zo, '|-', "zstd -8 -T0 >$outfile");
 
 my $cz = 0;
 my $outbuf = '';
 while (my $line = <STDIN>) {
    if ($cz >= $chunk && $line =~ m@^<\Q$tag\E[^>]*>@) {
       print STDERR "Limit for output file $outfile reached, opening ";
-      $zo->gzwrite($outbuf);
-      $zo->gzflush();
-      $zo->gzclose();
-      $cur++;
-      $outfile = $outname.'-'.sprintf('%05d', $cur).'.gz';
+      print $zo $outbuf;
+      close($zo);
+      ++$cur;
+      $outfile = $outname.'-'.sprintf('%05d', $cur).'.zstd';
       print STDERR "$outfile ...\n";
-      $zo = gzopen($outfile, 'wb5');
+      open($zo, '|-', "zstd -8 -T0 >$outfile");
       $cz = 0;
       $outbuf = '';
    }
@@ -50,11 +52,10 @@ while (my $line = <STDIN>) {
    $cz += length($line);
    $outbuf .= $line;
    if (length($outbuf) >= 268435456) {
-      $zo->gzwrite($outbuf);
+      print $zo $outbuf;
       $outbuf = '';
    }
 }
 
-$zo->gzwrite($outbuf);
-$zo->gzflush();
-$zo->gzclose();
+print $zo $outbuf;
+close($zo);
