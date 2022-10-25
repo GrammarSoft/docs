@@ -1,21 +1,21 @@
 # Corpus Encoding
 
 ## Tools
-* `chunk-tag.pl` `[--tag s]` `[--size 100]` `[--out split]`
+* `chunk-tag.pl` `[--tag s]` `[--size 100]` `[--out split]` <br>
   Splits input into chunks of `size` MiB each named `out-NNNNN.zstd`, making sure `<tag>` structures are not split in the middle.
-* `depcqp-append.pl`
+* `depcqp-append.pl` <br>
   Takes a dependency stream from `parse_cqp.pl` and appends each token's parent to itself.
-* `encode.sh`
+* `encode.sh` <br>
   Example CWB/CQP encoding script for corpora that have dependency.
 * `i2u`
   Converts a stream from ISO-8859-1 to UTF-8.
-* `parse_cqp.pl`
+* `parse_cqp.pl` <br>
   Converts a VISL stream into CQP-compatible verticalized text.
-* `split-year.pl`
+* `split-year.pl` <br>
   Splits and reenumerates input into years, according to the `stamp="YYYY-MM-DD"` attribute. Assumes that the input is sorted by this timestamp.
-* `u2h`
+* `u2h` <br>
   Converts a stream from UTF-8 to ISO-8859-1, but encodes unrepresentable characters as hexadecimal `\uNNNN` or `\UNNNNNNNN`.
-* `u2i`
+* `u2i` <br>
   Converts a stream from UTF-8 to ISO-8859-1. Converts combining characters to NFD and strips remaining characters that are not representable.
 
 ## From VISL to UTF-8 verticalized text
