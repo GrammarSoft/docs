@@ -16,7 +16,7 @@ cd $homedir
 cwb-encode -d $homedir -t $source \
         -P lex -P extra -P pos -P morph -P func -P role -P dself -P dparent -P endmark \
         -P h_word -P h_lex -P h_extra -P h_pos -P h_morph -P h_func -P h_role -P h_dself -P h_dparent -P h_endmark \
-        -S 's:0+id+tweet'
+        -S 's:0+id+tweet+comment+page+post'
 
 rm -fv $homedir/h_endmark*
 
