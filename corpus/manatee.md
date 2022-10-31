@@ -20,3 +20,9 @@ docker system prune -f
 
 docker run -it --rm --name manatee --hostname manatee -e LANG=en_US.UTF-8 -e LC_ALL=en_US.UTF-8 -v /home:/home -v /media:/media manatee /bin/bash
 ```
+
+# Encoding
+`zstdcat corpus.zstd | encodevert -c /home/manatee/registry/dan_twitter`
+
+# Query
+`corpquery /home/manatee/registry/dan_twitter '[lex="musling"]' -a 'word,lex,pos' -s 's.id,s.tweet,s.stamp,s.lstamp'`

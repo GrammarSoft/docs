@@ -1,0 +1,83 @@
+# Example Manatee registry file
+# Full docs: https://www.sketchengine.eu/documentation/corpus-configuration-file-all-features/
+
+NAME "dan_twitter"
+ENCODING "UTF-8"
+LANGUAGE "Danish"
+PATH /home/manatee/dan_twitter
+
+ATTRIBUTE word {
+	TYPE "MD_MGD"
+}
+ATTRIBUTE lex {
+	TYPE "MD_MGD"
+}
+ATTRIBUTE extra {
+	TYPE "MD_MGD"
+}
+ATTRIBUTE pos {
+	TYPE "MD_MGD"
+}
+ATTRIBUTE morph {
+	TYPE "MD_MGD"
+}
+ATTRIBUTE func {
+	TYPE "MD_MGD"
+}
+ATTRIBUTE role {
+	TYPE "MD_MGD"
+}
+ATTRIBUTE dself {
+	TYPE "MD_MGD"
+}
+ATTRIBUTE dparent {
+	TYPE "MD_MGD"
+}
+ATTRIBUTE endmark {
+	TYPE "MD_MGD"
+}
+ATTRIBUTE h_word {
+	TYPE "MD_MGD"
+}
+ATTRIBUTE h_lex {
+	TYPE "MD_MGD"
+}
+ATTRIBUTE h_extra {
+	TYPE "MD_MGD"
+}
+ATTRIBUTE h_pos {
+	TYPE "MD_MGD"
+}
+ATTRIBUTE h_morph {
+	TYPE "MD_MGD"
+}
+ATTRIBUTE h_func {
+	TYPE "MD_MGD"
+}
+ATTRIBUTE h_role {
+	TYPE "MD_MGD"
+}
+ATTRIBUTE h_dself {
+	TYPE "MD_MGD"
+}
+ATTRIBUTE h_dparent {
+	TYPE "MD_MGD"
+}
+ATTRIBUTE h_endmark {
+	TYPE "MD_MGD"
+}
+STRUCTURE s {
+	TYPE "map64"
+	ATTRIBUTE id {
+		NUMERIC 1
+		TYPE "UNIQUE"
+	}
+	ATTRIBUTE tweet {
+		NUMERIC 1
+	}
+	ATTRIBUTE user {
+		NUMERIC 1
+	}
+	ATTRIBUTE stamp
+	ATTRIBUTE lstamp
+}
