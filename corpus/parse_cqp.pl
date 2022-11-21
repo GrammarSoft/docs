@@ -148,7 +148,7 @@ while (defined(my $input = <>)) {
 
    if ($input !~ m@^</@) {
       # Don't eat </s> lines
-      $input =~ s@/@~u2044@g; # Unicode U+2044 Fraction Slash
+#      $input =~ s@/@~u2044@g; # Unicode U+2044 Fraction Slash
    }
    $input =~ s/\'/´/g;
    if (! ($input =~ /[\[]/)) {

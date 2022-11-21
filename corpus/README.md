@@ -31,7 +31,7 @@ Pieces:
 
 ## From UTF-8 verticals to ISO-8859-1 hex verticalized text
 Combined:
-`zstdcat input.zstd | u2h | PERL_UNICODE= LC_ALL=C perl -wpne 's@\\([uU])([0-9A-Fa-f]{4,8})@~$1$2@g;' | pigz -1c >output.gz`
+`zstdcat input.zstd | perl -wpne 'if (/\t/) { s@/@~u2044@g;}' | u2h | PERL_UNICODE= LC_ALL=C perl -wpne 's@\\([uU])([0-9A-Fa-f]{4,8})@~$1$2@g;' | pigz -1c >output.gz`
 
 This yields a VISL CQP compatible file.
 
