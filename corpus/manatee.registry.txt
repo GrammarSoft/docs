@@ -66,6 +66,7 @@ ATTRIBUTE h_dparent {
 ATTRIBUTE h_endmark {
 	TYPE "MD_MGD"
 }
+
 STRUCTURE s {
 	TYPE "map64"
 	ATTRIBUTE id {
@@ -75,9 +76,39 @@ STRUCTURE s {
 	ATTRIBUTE tweet {
 		NUMERIC 1
 	}
-	ATTRIBUTE user {
-		NUMERIC 1
-	}
 	ATTRIBUTE stamp
 	ATTRIBUTE lstamp
+}
+
+ATTRIBUTE word_lc {
+	DYNAMIC utf8lowercase
+	DYNLIB internal
+	ARG1 "C"
+	FUNTYPE s
+	FROMATTR word
+	DYNTYPE index
+	TRANSQUERY yes
+}
+ATTRIBUTE lex_lc {
+	DYNAMIC utf8lowercase
+	DYNLIB internal
+	ARG1 "C"
+	FUNTYPE s
+	FROMATTR lex
+	DYNTYPE index
+	TRANSQUERY yes
+}
+ATTRIBUTE word_nd {
+	DYNAMIC "/home/manatee/public_html/_bin/conv-lc-nd"
+	DYNLIB "pipe"
+	DYNTYPE index
+	FROMATTR word
+	TRANSQUERY yes
+}
+ATTRIBUTE lex_nd {
+	DYNAMIC "/home/manatee/public_html/_bin/conv-lc-nd"
+	DYNLIB "pipe"
+	DYNTYPE index
+	FROMATTR lex
+	TRANSQUERY yes
 }
