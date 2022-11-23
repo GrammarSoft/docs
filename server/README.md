@@ -36,6 +36,7 @@ echo -n "$PASS" | cryptsetup open UUID=78300cfb-a8b9-4791-b298-b02b882d7742 cryp
 echo -n "$PASS" | cryptsetup open UUID=93106265-d7a7-4c6d-862c-baf96be800a2 crypt-nvme1
 
 mount -onoatime,compress-force=zstd:15,ssd,discard LABEL=data /media/data
+mount -onoatime,compress-force=zstd:15,ssd,discard,subvol=@home LABEL=data /home
 ```
 
 ## Packages
@@ -71,3 +72,7 @@ shopt -s nocaseglob
 
 export IGNOREEOF=1
 ```
+
+## Apache + PHP
+* `apt-get install libapache2-mod-php libapache2-mpm-itk php-sqlite3 php-mbstring php-cli php-intl apache2 sqlite3 timeout icu-devtools`
+* Ensure `a2enmod deflate` and insert `DeflateCompressionLevel 1` in `/etc/apache2/mods-available/deflate.conf`
