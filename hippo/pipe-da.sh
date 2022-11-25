@@ -16,3 +16,9 @@ zcat "split-NUMBER.gz" \
 | sed 's/\\xA0/ /g' \
 | /usr/bin/time -o time-NUMBER.log /work/xperohs/parsers/dansk/bin/dangram --role 2>error-NUMBER.log \
 | gzip -c > output-NUMBER.gz
+
+export "PATH=$PATH:/work/xperohs/docs/corpus"
+zcat output-NUMBER.gz | perl -Mutf8 -we 'my $s=""; while (<STDIN>) { if (/^<s/) {$s=$_;} if (/ #1->/) { print "</s>\n$s"; } print; }' | parse_cqp.pl | depcqp-append.pl | perl -Mutf8 -we 'while(<STDIN>) { if (/^<s/) {$_="";} if (/^(?:\x{a4}|¤)\t([^\t]+)/) {$a=$1; $ a=~ s/"-/" /g; print "<s $a>\n"; s/^(\x{a4}|¤)\t[^\t]+/\x{a4}\t\x{a4}/;} print; }' | perl -Mutf8 -we 'my $i=0; while(<STDIN>) { if (/^<s /) {++$i; s/^<s id="([^"]+)"/<s id="$i"/; s/( l?stamp="\d+-\d+-\d+)-/$1 /g;} print;}' | gzip -c >output-NUMBER.manatee.gz
+
+chgrp xperohs *NUMBER*
+chmod g+rw *NUMBER*
