@@ -38,7 +38,7 @@ docker run -it --rm --name manatee --hostname manatee -e LANG=en_US.UTF-8 -e LC_
 # Encoding
 ```
 export PYTHONPATH=/usr/local/manatee/lib/python3.10/site-packages "PATH=$PATH:/usr/local/manatee/bin"
-zstdcat corpus.zstd | encodevert -c /home/manatee/storage/registry/dan_twitter
+zstdcat corpus.zst | encodevert -c /home/manatee/storage/registry/dan_twitter
 ```
 
 # Query

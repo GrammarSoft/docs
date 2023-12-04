@@ -2,7 +2,7 @@
 
 ## Tools
 * `chunk-tag.pl` `[--tag s]` `[--size 100]` `[--out split]` <br>
-  Splits input into chunks of `size` MiB each named `out-NNNNN.zstd`, making sure `<tag>` structures are not split in the middle.
+  Splits input into chunks of `size` MiB each named `out-NNNNN.zst`, making sure `<tag>` structures are not split in the middle.
 * `depcqp-append.pl` <br>
   Takes a dependency stream from `parse_cqp.pl` and appends each token's parent to itself.
 * `encode.sh` <br>
@@ -20,7 +20,7 @@
 
 ## From VISL to UTF-8 verticalized text
 Combined:
-`zstdcat input.zstd | perl -Mutf8 -wpne 's/<FN:([^>]+)&&([^>]+)>/<FN:$1> <FN:$2>/g; s/<FN:([^>\/]+).*?>/<fn:$1>/g;' | perl -Mutf8 -we 'my $s=""; while (<STDIN>) { if (/^<s/) {$s=$_;} if (/ #1->/) { print "</s>\n$s"; } print; }' | parse_cqp.pl | depcqp-append.pl | perl -Mutf8 -we 'while(<STDIN>) { if (/^<s/) {$_="";} if (/^(?:\x{a4}|¤)\t([^\t]+)/) {$a=$1; $ a=~ s/"-/" /g; print "<s $a>\n"; s/^(\x{a4}|¤)\t[^\t]+/\x{a4}\t\x{a4}/;} print; }' | perl -Mutf8 -we 'my $i=0; while(<STDIN>) { if (/^<s /) {++$i; s/^<s id="([^"]+)"/<s id="$i"/; s/( l?stamp="\d+-\d+-\d+)-/$1 /g;} print;}' | zstd -15 -T0 -c >output.zstd`
+`zstdcat input.zst | perl -Mutf8 -wpne 's/<FN:([^>]+)&&([^>]+)>/<FN:$1> <FN:$2>/g; s/<FN:([^>\/]+).*?>/<fn:$1>/g;' | perl -Mutf8 -we 'my $s=""; while (<STDIN>) { if (/^<s/) {$s=$_;} if (/ #1->/) { print "</s>\n$s"; } print; }' | parse_cqp.pl | depcqp-append.pl | perl -Mutf8 -we 'while(<STDIN>) { if (/^<s/) {$_="";} if (/^(?:\x{a4}|¤)\t([^\t]+)/) {$a=$1; $ a=~ s/"-/" /g; print "<s $a>\n"; s/^(\x{a4}|¤)\t[^\t]+/\x{a4}\t\x{a4}/;} print; }' | perl -Mutf8 -we 'my $i=0; while(<STDIN>) { if (/^<s /) {++$i; s/^<s id="([^"]+)"/<s id="$i"/; s/( l?stamp="\d+-\d+-\d+)-/$1 /g;} print;}' | zstd -15 -T0 -c >output.zst`
 
 This yields a Manatee compatible file. This cannot be used with VISL's CQP setup, but instructions for that is below.
 
@@ -32,7 +32,7 @@ Pieces:
 
 ## From UTF-8 verticals to ISO-8859-1 hex verticalized text
 Combined:
-`zstdcat input.zstd | perl -wpne 'if (/\t/) { s@/@~u2044@g;}' | u2h | PERL_UNICODE= LC_ALL=C perl -wpne 's@\\([uU])([0-9A-Fa-f]{4,8})@~$1$2@g;' | pigz -1c >output.gz`
+`zstdcat input.zst | perl -wpne 'if (/\t/) { s@/@~u2044@g;}' | u2h | PERL_UNICODE= LC_ALL=C perl -wpne 's@\\([uU])([0-9A-Fa-f]{4,8})@~$1$2@g;' | pigz -1c >output.gz`
 
 This yields a VISL CQP compatible file.
 

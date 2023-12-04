@@ -38,7 +38,7 @@ while (<STDIN>) {
          $id = 0;
          $lines = 0;
          $words = 0;
-         open($fh, '|-', "zstd -8 -T0 >${ARGV[0]}-$year.zstd");
+         open($fh, '|-', "zstd -8 -T0 >${ARGV[0]}-$year.zst");
       }
       ++$id;
       s/ id="\d+"/ id="$id"/g;

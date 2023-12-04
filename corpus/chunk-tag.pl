@@ -31,7 +31,7 @@ print STDERR "Splitting on <${tag}> into ${chunk} MiB chunks.\n";
 $chunk *= 1024 * 1024;
 
 my $cur = 0;
-my $outfile = $outname.'-'.sprintf('%05d', $cur).'.zstd';
+my $outfile = $outname.'-'.sprintf('%05d', $cur).'.zst';
 open(my $zo, '|-', "zstd -8 -T0 >$outfile");
 
 my $cz = 0;
@@ -42,7 +42,7 @@ while (my $line = <STDIN>) {
       print $zo $outbuf;
       close($zo);
       ++$cur;
-      $outfile = $outname.'-'.sprintf('%05d', $cur).'.zstd';
+      $outfile = $outname.'-'.sprintf('%05d', $cur).'.zst';
       print STDERR "$outfile ...\n";
       open($zo, '|-', "zstd -8 -T0 >$outfile");
       $cz = 0;
