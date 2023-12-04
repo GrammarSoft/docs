@@ -112,3 +112,16 @@ ATTRIBUTE lex_nd {
 	FROMATTR lex
 	TRANSQUERY yes
 }
+
+ATTRIBUTE sem {
+	DYNAMIC "/home/manatee/public_html/_bin/extract-semantics"
+	DYNLIB "pipe"
+	DYNTYPE index
+	FROMATTR extra
+}
+ATTRIBUTE h_sem {
+	DYNAMIC "/home/manatee/public_html/_bin/extract-semantics"
+	DYNLIB "pipe"
+	DYNTYPE index
+	FROMATTR h_extra
+}
