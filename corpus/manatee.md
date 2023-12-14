@@ -36,13 +36,29 @@ docker run -it --rm --name manatee --hostname manatee -e LANG=en_US.UTF-8 -e LC_
 ```
 
 # Encoding
+* Copy `manatee.registry.txt` to a file named something like `corpus_name.reg` and edit it with the correct `NAME`, `PATH`, and adjust the `STRUCTURE` to the attributes present in the data.
+
 ```
 export PYTHONPATH=/usr/local/manatee/lib/python3.10/site-packages "PATH=$PATH:/usr/local/manatee/bin"
-zstdcat corpus.zst | encodevert -c /home/manatee/storage/registry/dan_twitter
+zstdcat corpus.zst | encodevert -c /home/manatee/storage/registry/corpus_name.reg
 ```
 
+* This will likely throw some errors at the end about not being able to generate the dynamic attributes, but those will be generated later so it's not a problem.
+
 # Query
+* Test that the corpus works by running a cmdline query.
+
 ```
 export PYTHONPATH=/usr/local/manatee/lib/python3.10/site-packages "PATH=$PATH:/usr/local/manatee/bin"
-corpquery /home/manatee/registry/dan_twitter '[lex="musling"]' -a 'word,lex,pos' -s 's.id,s.tweet,s.stamp,s.lstamp'
+corpquery /home/manatee/storage/registry/corpus_name.reg '[lex="musling"]' -a 'word,lex,pos' -s 's.id,s.tweet,s.stamp,s.lstamp'
 ```
+
+# Upload and adjust
+* Upload the corpus folder: `rsync -avzP --inplace corpus_name manatee@corp2.visl.dk:/home/manatee/storage/corpora/`
+* Upload the corpus registry: `rsync -avzP --inplace corpus_name.reg manatee@corp2.visl.dk:/home/manatee/storage/registry/corpus_name`
+
+* `ssh -Al manatee corp2.visl.dk` and then:
+* Adjust `~/storage/registry/corpus_name` with the server-side `PATH`.
+* `export PYTHONPATH=/usr/local/manatee/lib/python3.10/site-packages "PATH=$PATH:/usr/local/manatee/bin"`
+* For each dynamic attribute, run `mkdynattr`. E.g., for `word_lc` run `mkdynattr ~/storage/registry/corpus_name word_lc`
+* Continue in https://github.com/GrammarSoft/corp-ui/blob/main/README.md
