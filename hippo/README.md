@@ -4,17 +4,21 @@
 * https://docs.hpc-type3.sdu.dk/
 
 ## Modules and environment
-Run `module avail` and note newest modules for `GCC`, `git`, `CMake`, and `binutils`.
+Run `module avail` and note newest modules for `GCC`, `git`, `CMake`, and `binutils`. May require using `module spider` to determine a set of recent modules that are all compatible.
 
 Create `/work/xperohs/init.sh` with noted modules and environment variables:
 ```
-module load GCC/11.3.0
-module load CMake/3.23.1
-module load git/2.36.0-nodocs
-module load binutils/2.38
+module load GCCcore/13.2.0
+module load GCC/13.2.0
+module load CMake/3.27.6
+module load binutils/2.40
+module load ICU/74.1
+module load git/2.42.0
+module load Python/3.11.5
 
 export "PATH=/work/xperohs/perl:/work/xperohs/run/perl5/bin:/work/xperohs/run/bin:$PATH"
 export "LD_LIBRARY_PATH=/work/xperohs/run/lib:/work/xperohs/run/lib64:$LD_LIBRARY_PATH"
+export "PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/work/xperohs/run/lib/pkgconfig"
 
 export PERL_MB_OPT="--install_base /work/xperohs/run/perl5"
 export PERL_MM_OPT="INSTALL_BASE=/work/xperohs/run/perl5"
@@ -31,12 +35,27 @@ mkdir -pv /work/xperohs/build /work/xperohs/run/bin
 scp /usr/local/bin/u2i /usr/local/bin/i2u tinod@hpc-type3.sdu.dk:/work/xperohs/run/bin/
 ```
 
+## Berleley DB
+```
+cd /work/xperohs/build
+wget https://github.com/berkeleydb/libdb/releases/download/v5.3.28/db-5.3.28.tar.gz # or newer
+tar -zxvf db-5.3.28.tar.gz
+cd db-5.3.28/build_unix
+
+../dist/configure --enable-dbm --disable-static --prefix=/work/xperohs/run/
+make -j
+make -j test
+make install
+```
+
 ## Perl
 ```
 cd /work/xperohs/build
-wget https://www.cpan.org/src/5.0/perl-5.36.0.tar.gz # or whichever is latest Perl at this time
-tar -zxvf perl-5.36.0.tar.gz
-cd perl-5.36.0
+wget https://www.cpan.org/src/5.0/perl-5.42.0.tar.gz # or whichever is latest Perl at this time
+tar -zxvf perl-5.42.0.tar.gz
+cd perl-5.42.0
+
+# May require making a dummy symlink from csh to bash
 
 ./Configure -Duselongdouble -Dprefix=/work/xperohs/run -Dusethreads -Uuselargefiles
 # ...and answer a lot of questions, or just accept default for everything.
@@ -44,15 +63,18 @@ make -j
 make -j test
 make install
 
+export 'CPPFLAGS=-I/work/xperohs/run/include' 'LDFLAGS=-L/work/xperohs/run/lib -L/work/xperohs/run/lib64' 'DB_FILE_INCLUDE=/work/xperohs/run/include' 'DB_FILE_LIB=/work/xperohs/run/lib'
+cpan -i Encode
 cpan -i Bundle::CPAN # Repeat until nothing new is installed
 cpan -i IPC::Run MLDBM::Sync DB_File Lingua::Identify String::Approx Encode DBM_Filter Getopt::Long IPC::Open2 SDBM_File YAML
 ```
 
+<!--
 ## ICU
 ```
 cd /work/xperohs/build
-wget https://github.com/unicode-org/icu/releases/download/release-71-1/icu4c-71_1-src.tgz # or whichever is latest ICU at this time
-tar -zxvf icu4c-71_1-src.tgz
+wget https://github.com/unicode-org/icu/releases/download/release-77-1/icu4c-77_1-src.tgz # or whichever is latest ICU at this time
+tar -zxvf icu4c-77_1-src.tgz
 cd icu/source
 
 ./runConfigureICU Linux --prefix=/work/xperohs/run/
@@ -60,15 +82,105 @@ make -j
 make -j check
 make install
 ```
+-->
+
+## SQLite
+```
+cd /work/xperohs/build
+wget https://sqlite.org/2025/sqlite-autoconf-3500400.tar.gz # or whichever is newest from https://sqlite.org/download.html
+tar -zxvf sqlite-autoconf-3500400.tar.gz
+
+./configure --prefix=/work/xperohs/run/
+make -j
+make -j check
+make install
+```
+
+## RapidJSON
+```
+cd /work/xperohs/build
+git clone --depth 1 https://github.com/Tencent/rapidjson
+cd rapidjson
+git clean -f -d -x
+
+cmake -DCMAKE_INSTALL_PREFIX=/work/xperohs/run .
+make -j
+make install
+```
 
 ## CG-3
 ```
 cd /work/xperohs/build
-git clone https://github.com/GrammarSoft/cg3
+git clone --depth 1 https://github.com/GrammarSoft/cg3
 cd cg3
+git clean -f -d -x
 
+module load Boost/1.83.0
 cmake -DCMAKE_INSTALL_PREFIX=/work/xperohs/run .
 make -j
 ./test/runall.pl
+make install
+```
+
+## OpenFST
+```
+cd /work/xperohs/build
+git clone --depth 1 https://github.com/TinoDidriksen/openfst
+cd openfst
+git clean -f -d -x
+
+# Edit configure.ac to insert " -msse -msse2 -mfpmath=sse" after -std=c++17
+
+module load libtool/2.4.7
+autoreconf -fvi
+./configure --enable-bin --enable-compact-fsts --enable-compress --enable-const-fsts --enable-far --enable-fsts --enable-grm --enable-linear-fsts --enable-lookahead-fsts --enable-mpdt --enable-ngram-fsts --enable-pdt --enable-special --disable-static --prefix=/work/xperohs/run/
+make -j
+make -j check
+make install
+```
+
+## Foma
+```
+cd /work/xperohs/build
+git clone --depth 1 https://github.com/mhulden/foma
+cd foma/foma
+git clean -f -d -x
+
+module load Bison/3.8.2
+module load flex/2.6.4
+module load libreadline/8.2
+cmake -DCMAKE_INSTALL_PREFIX=/work/xperohs/run .
+make -j
+make install
+```
+
+## HFST
+```
+cd /work/xperohs/build
+git clone --depth 1 https://github.com/hfst/hfst
+cd hfst
+git clean -f -d -x
+
+module load libtool/2.4.7
+module load Bison/3.8.2
+module load flex/2.6.4
+module load libreadline/8.2
+export 'CPPFLAGS=-I/work/xperohs/run/include' 'LDFLAGS=-L/work/xperohs/run/lib -L/work/xperohs/run/lib64'
+autoreconf -fvi
+./configure --disable-static --enable-all-tools --with-readline --prefix=/work/xperohs/run/
+make -j
+make -j1 check
+make install
+```
+
+## Zstd
+```
+cd /work/xperohs/build
+wget https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz # or newer
+tar -zxvf zstd-1.5.7.tar.gz
+cd zstd-1.5.7/build/cmake
+
+cmake -DCMAKE_INSTALL_PREFIX=/work/xperohs/run .
+make -j
 make install
 ```
