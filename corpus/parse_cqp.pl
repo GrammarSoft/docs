@@ -30,9 +30,7 @@ use feature 'unicode_strings';
 
 
 my $source = "";  #variable to hold the source of the current sentence, now printed at first word of the sentence. Due to complexity problems it can't be an attribute
-my $altsource = '';
 my $line = 1;     #counter to hold the current line number
-my $sentline =1; # counter for oversize sentences
 
 #HACK - end sequence to mark the en of a word.
 # this string MUST NOT be anywhere else in the input
@@ -221,25 +219,17 @@ while (defined(my $input = <>)) {
    print "$word\t$lex\t$extra\t$pos\t$morph\t$func\t$role\t$dself\t$dparent\t$end_seq\n";
 
    $line++;
-   $sentline++;
    slut:
 }
 
 
 sub look_for_sentence {
    #finds a sentence-tag <s and gets the source
-#   print "--her $sentline startsentence=$startsentence -- $_[0]\n";
-   if ($_[0] =~ /^<s id=/ || $sentline > 200 && ($_[0] ="<source=oversize_$altsource>")) {
-      # && ($sentline=0)
-      $sentline =0;
-
-      ### CAVE timeouts on corp can be caused by segmentation fault in cqp. This only breaks output in single corpus mode, but stalls it in multi corpus mode. Segmentation fault is caused by oversized <s> sections !!! Therefore $sentline inserted, though untested
+#   print "--her startsentence=$startsentence -- $_[0]\n";
+   if ($_[0] =~ /^<s id=/) {
 
       $_[0] =~ s/^<([sS]ource=|s[ ~_]?|id=|ID=|ext[ ~_])(.*)>.*[^.]*$/$2/; #changed
       if ($_[0]) {$source = $_[0]}
-      else {
-         $source =$altsource; # folha/publico has <ext ... for paragraphs, not sentences
-      }
 #      print "--her source=$source\n";
       $novnum++;
       $source =~ s/(id=\")[0-9]+/$1$novnum/;
@@ -247,7 +237,6 @@ sub look_for_sentence {
       $source =~ s/ /-/g; # Wiki, før //
 
 #      $source =~ s/s=?[0-9]+//; # complexity reduction, only necessary if id written as attribute, not when written as 1. word
-      if (! ($source =~ /oversize/)) {$altsource =$source;}
       if (! $startsentence) {
          print "</s>\n<s>\n";
          print "¤\t$source\t\tPU\t\tSTART\t\t0\t0\t$end_seq\n";
