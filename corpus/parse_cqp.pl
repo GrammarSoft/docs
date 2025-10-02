@@ -62,7 +62,8 @@ while (defined(my $input = <>)) {
    }
    $role =~ s/\s+$//g;
 
-#   print "--$input";
+   #   print "--$input";
+my $sem; while ($input =~ s/ £([^ ]+)//) {$sem=$1; if ($input !~ /<\Q$sem\E>/) {$input =~ s/ (N|PROP|NUM|ADJ) / <$sem> $1 /;}} # dangram --onto input
    $input =~ s/ [\£&][^ \n]+//g;
    $input =~ s/ <((fr?|se):[^>]*|Rare[^>]*?|\'[^>]*?\'|exdem|\+[^>]*?|[0-9]+)>//g; # frequency, translation etc.
    # dependency
