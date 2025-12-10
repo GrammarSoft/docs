@@ -29,20 +29,32 @@ use feature 'unicode_strings';
 #
 
 
-my $source = "";  #variable to hold the source of the current sentence, now printed at first word of the sentence. Due to complexity problems it can't be an attribute
 my $line = 1;     #counter to hold the current line number
 
 #HACK - end sequence to mark the en of a word.
 # this string MUST NOT be anywhere else in the input
 my $end_seq = "_End!_";
 
-my $startsentence = 0;
 my $fs_func = '';
-my $novnum = 0;
 
 #Read all lines from the file(s) given as argument and parse them
 while (defined(my $input = <>)) {
    my ($dself, $dparent) = (0, 0);
+
+   # skip <s> tags so they don't get mangled
+   if ($input =~ m@^<s@) {
+      print $input;
+      print "¤\t¤\t\tPU\t\tSTART\t\t0\t0\t$end_seq\n";
+      next;
+   }
+   if ($input =~ m@^</s@) {
+      print $input;
+      next;
+   }
+   # remove paragraph signs
+   if ($input =~ /^\$¶.*/) {
+      next;
+   }
 
    $input =~ s/[\x{7F}-\x{9F}]+//g;
 
@@ -63,7 +75,12 @@ while (defined(my $input = <>)) {
    $role =~ s/\s+$//g;
 
    #   print "--$input";
-my $sem; while ($input =~ s/ £([^ ]+)//) {$sem=$1; if ($input !~ /<\Q$sem\E>/) {$input =~ s/ (N|PROP|NUM|ADJ) / <$sem> $1 /;}} # dangram --onto input
+   while ($input =~ s/ £([^ ]+)//) { # dangram --onto input
+      my $sem = $1;
+      if ($input !~ /<\Q$sem\E>/) {
+         $input =~ s/ (N|PROP|NUM|ADJ) / <$sem> $1 /;
+      }
+   }
    $input =~ s/ [\£&][^ \n]+//g;
    $input =~ s/ <((fr?|se):[^>]*|Rare[^>]*?|\'[^>]*?\'|exdem|\+[^>]*?|[0-9]+)>//g; # frequency, translation etc.
    # dependency
@@ -71,7 +88,6 @@ my $sem; while ($input =~ s/ £([^ ]+)//) {$sem=$1; if ($input !~ /<\Q$sem\E>/) 
       ($dself,$dparent) = (int($1), int($2));
    }
    $input =~ s/\x{a0}/ /g; # ASCII 00A0, wrong space from Brazio-dos (Raquel)
-   if ($input =~ /^\$/ || $input =~ /\t *\[/) {$startsentence =0;}
    $input =~ s/^< *\n//; # isolated < lines from wiki
    $input =~ s/(\t *[^\t]+).*/$1/; # removes all but one morph-reading
    $input =~ s/ KC( .*)(<adv>)+/ $2 KC$1/g; # midlertidig K2000 lap, nu klaret i remove_secondary.dansk
@@ -155,7 +171,6 @@ my $sem; while ($input =~ s/ £([^ ]+)//) {$sem=$1; if ($input !~ /<\Q$sem\E>/) 
    }
 
 
-   look_for_sentence($input);
    remove_tags($input);
    clean_numbers($input);
    #clean_delimiters($input);
@@ -223,41 +238,6 @@ my $sem; while ($input =~ s/ £([^ ]+)//) {$sem=$1; if ($input !~ /<\Q$sem\E>/) 
    slut:
 }
 
-
-sub look_for_sentence {
-   #finds a sentence-tag <s and gets the source
-#   print "--her startsentence=$startsentence -- $_[0]\n";
-   if ($_[0] =~ /^<s id=/) {
-
-      $_[0] =~ s/^<([sS]ource=|s[ ~_]?|id=|ID=|ext[ ~_])(.*)>.*[^.]*$/$2/; #changed
-      if ($_[0]) {$source = $_[0]}
-#      print "--her source=$source\n";
-      $novnum++;
-      $source =~ s/(id=\")[0-9]+/$1$novnum/;
-      $source =~ s/_/-/g; # Wiki, før //
-      $source =~ s/ /-/g; # Wiki, før //
-
-#      $source =~ s/s=?[0-9]+//; # complexity reduction, only necessary if id written as attribute, not when written as 1. word
-      if (! $startsentence) {
-         print "</s>\n<s>\n";
-         print "¤\t$source\t\tPU\t\tSTART\t\t0\t0\t$end_seq\n";
-         $startsentence =1;
-      }
-#      print "¤\t¤\t\tPU\t\tSTART\t\t$end_seq\n";
-#      print "**SOURCE: $source\n";
-      $_[0] = "";
-   }
-   elsif( $_[0] =~ m@^</s>.*@ ) {
-      #finds a end-sentence tag, and strips it
-      $_[0] = "";
-   }
-   else {
-      #remove paragraph signs
-      $_[0] =~ s/^\$\¶.*//;
-      #remove lines with <xxx>
-      $_[0] =~ s/^<[^>]*>.*$//;
-   }
-}
 
 sub clean_numbers {
    $_[0] =~ s/^\$(.*\s*\[)/$1/;
